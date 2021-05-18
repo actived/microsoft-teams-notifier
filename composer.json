@@ -1,8 +1,8 @@
 {
   "name": "actived/microsoft-teams-notifier",
-  "description": "description",
+  "description": "Monolog handler sending Microsoft Teams notifications with an Incoming Webhook",
+  "homepage": "https://github.com/actived/microsoft-teams-notifier",
   "keywords": ["microsoft", "teams", "webhook", "notifier", "log", "monolog"],
-  "type": "library",
   "license": "MIT",
   "authors": [
     {
@@ -10,8 +10,7 @@
       "homepage": "https://actived.fr/"
     },
     {
-      "name": "Kamil KUBICKI",
-      "email": "github@actived.fr"
+      "name": "Kamil KUBICKI"
     }
   ],
   "autoload": {

@@ -3,7 +3,7 @@ Actived Microsoft Teams Notifier
 
 ![Package Version](https://img.shields.io/badge/Version-1.0.1-brightgreen.svg)
 
-A PHP package that defines custom Monolog handler to send Microsoft Teams notifications with Incoming Webhook.
+A PHP package that defines custom Monolog handler to send Microsoft Teams notifications with an Incoming Webhook.
 The package aims to provide global messaging & log system that uses Microsoft Teams "MessageCard" notification and uses Monolog logging library.
 
 # Features
