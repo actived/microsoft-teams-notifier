@@ -1,0 +1,39 @@
+{
+  "name": "actived/microsoft-teams-notifier",
+  "description": "description",
+  "keywords": ["microsoft", "teams", "webhook", "notifier", "log", "monolog"],
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Actived",
+      "homepage": "https://actived.fr/"
+    },
+    {
+      "name": "Kamil KUBICKI",
+      "email": "github@actived.fr"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Actived\\MicrosoftTeamsNotifier\\": "src/"
+    }
+  },
+  "autoload-dev": {
+      "psr-4": {
+        "Actived\\MicrosoftTeamsNotifier\\": "tests/"
+      }
+  },
+  "require": {
+    "php": ">=7.2",
+    "symfony/monolog-bundle": "^3.7"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^0.12.87",
+    "phpunit/phpunit": "^9.5"
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit",
+    "phpstan": "vendor/bin/phpstan analyse"
+  }
+}
