@@ -48,6 +48,16 @@ class MicrosoftTeamsRecord {
     private $subject;
 
     /**
+     * @var string|null
+     */
+    private $emoji;
+
+    /**
+     * @var string|null
+     */
+    private $color;
+
+    /**
      * @var array
      */
     private $data = [];
@@ -56,10 +66,14 @@ class MicrosoftTeamsRecord {
      * MicrosoftTeamsRecord constructor
      * @param string $title
      * @param string $subject
+     * @param string|null $emoji
+     * @param string|null $color
      */
-    public function __construct(string $title, string $subject) {
+    public function __construct(string $title, string $subject, ?string $emoji = null, ?string $color = null) {
         $this->title = $title;
         $this->subject = $subject;
+        $this->emoji = $emoji;
+        $this->color = $color;
     }
 
     /**
@@ -89,7 +103,7 @@ class MicrosoftTeamsRecord {
             ->setContext()
             ->setThemeColor($record['level'])
             ->setTitle($record['level'])
-            ->setText($record['message'])
+            ->setText($record['formatted'])
             ->setSections($record)
         ;
 
@@ -132,7 +146,7 @@ class MicrosoftTeamsRecord {
      */
     public function setThemeColor(int $level): self
     {
-        $this->data['themeColor'] = $this->getThemeColor($level);
+        $this->data['themeColor'] = $this->color ? $this->color : $this->getThemeColor($level);
 
         return $this;
     }
@@ -143,7 +157,9 @@ class MicrosoftTeamsRecord {
      */
     public function setTitle(int $level): self
     {
-        $this->data['title'] = sprintf('%s %s', $this->getEmoji($level), $this->title);
+        $this->data['title'] = sprintf('%s %s',
+            $this->emoji ? $this->emoji : $this->getEmoji($level)
+            , $this->title);
 
         return $this;
     }

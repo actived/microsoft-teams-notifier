@@ -31,25 +31,38 @@ class MicrosoftTeamsHandler extends AbstractProcessingHandler
     private $microsoftTeamsRecord;
 
     /**
+     * Format of the message
+     * @var string|null
+     */
+    private $format;
+
+    /**
      * MicrosoftTeamsHandler constructor.
      * @param string $webhookDsn
-     * @param int    $level
      * @param string $title
      * @param string $subject
-     * @param bool   $bubble
+     * @param string|null $emoji
+     * @param string|null $color
+     * @param string|null $format
+     * @param int $level
+     * @param bool $bubble
      */
     public function __construct(
         string $webhookDsn,
-        int $level = Logger::DEBUG,
+        $level = Logger::DEBUG,
         string $title = 'Message',
         string $subject = 'Date',
+        ?string $emoji = null,
+        ?string $color = null,
+        ?string $format = '%message%',
         bool $bubble = true
     )
     {
         parent::__construct($level, $bubble);
 
         $this->webhookDsn = $webhookDsn;
-        $this->microsoftTeamsRecord = new MicrosoftTeamsRecord($title, $subject);
+        $this->format = $format;
+        $this->microsoftTeamsRecord = new MicrosoftTeamsRecord($title, $subject, $emoji, $color);
     }
 
     /**
@@ -57,7 +70,7 @@ class MicrosoftTeamsHandler extends AbstractProcessingHandler
      */
     protected function getDefaultFormatter(): FormatterInterface
     {
-        return new LineFormatter('[%datetime%] %message% %context% %extra%', 'Y-m-d H:i:s', false, true);
+        return new LineFormatter($this->format, 'Y-m-d H:i:s', false, true);
     }
 
     /**

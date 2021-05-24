@@ -55,7 +55,7 @@ class MicrosoftTeamsRecordTest extends TestCase {
             'level' => $level,
             'level_name' => Logger::getLevelName($level),
             'datetime' => new DateTimeImmutable(true),
-            'extra' => [],
+            'formatted' => 'Formatted message',
         ];
     }
 }
