@@ -48,29 +48,33 @@ services:
 +        class: Actived\MicrosoftTeamsNotifier\Handler\MicrosoftTeamsHandler
 +        arguments:
 +            $webhookDsn: '%env(ACTIVED_MS_TEAMS_DSN)%'
++            $level: 'error'
 +            $title: 'Message title' 
++            $subject: 'Message subject' 
 +            $emoji:  '&#x1F6A8'  
 +            $color: '#fd0404' 
 +            $format: '[%datetime%] %channel%.%level_name%: %message%'
-+            $level: 'error'
 ```
 > *$webhookDsn:*  
 > Microsoft Teams webhook url
-> 
-> *$title:*  
-> title of Microsoft Teams Message
-> 
-> *$emoji:*  
-> emoji of Microsoft Teams Message (dsiplayed next to the mlessage title). Value needs to reflect the mattern: ‘&#x<EMOJI_HEX_CODE>’
-> 
-> *$color:*  
-> hexadecimal color value for Message Card color theme
-> 
-> *$color:*  
-> every handler uses a Formatter to format the record before logging it. This attribute can be set to overwrite default log message (available options: %datetime% | %extra.token% | %channel% | %level_name% | %message%).
-> 
+>
 > *$level:*  
 > the minimum level for handler to be triggered and the message be logged in the channel (Monolog/Logger class: ‘error’ = 400)
+> 
+> *$title (nullable):*  
+> title of Microsoft Teams Message
+> 
+> *$subject (nullable):*  
+> subject of Microsoft Teams Message
+>
+> *$emoji (nullable):*  
+> emoji of Microsoft Teams Message (displayed next to the message title). Value needs to reflect the pattern: ‘&#x<EMOJI_HEX_CODE>’
+> 
+> *$color (nullable):*  
+> hexadecimal color value for Message Card color theme
+> 
+> *$format (nullable):*  
+> every handler uses a Formatter to format the record before logging it. This attribute can be set to overwrite default log message (available options: %datetime% | %extra.token% | %channel% | %level_name% | %message%).
 
 Modify your Monolog settings that will point from now to the new handler:
 
@@ -87,8 +91,12 @@ monolog:
 +            type: service
 +            id: actived_ms_teams_handler
 ```
-‘type’: handler type (in our case this references custom notifier service)
-‘id’: notifier service class \Actived\MicrosoftTeamsNotifier\LogMonolog
+
+> *type:*  
+> handler type (in our case this references custom notifier service)
+>
+> *id:*  
+> notifier service class \Actived\MicrosoftTeamsNotifier\LogMonolog
 
 # Laravel configuration
 
@@ -101,6 +109,8 @@ ACTIVED_MS_TEAMS_DSN=webhook_dsn
 ```
 
 Modify your Monolog logging settings that will point to the new handler:
+
+### att: definition of ALL parameters is compulsory - please use NULL value for attributes you want to skip.
 
 ```diff
 // config\logging.php
@@ -119,17 +129,18 @@ return [
 +            'channels' => ['single', 'custom'],
             'ignore_exceptions' => false
         ],
-        
+
+         # ACTIVED MICROSOFT TEAMS NOTIFIER
 +       'custom' => [
 +            'driver' => 'custom',
 +            'via' => \Actived\MicrosoftTeamsNotifier\LogMonolog::class,
 +            'webhookDsn' => env('ACTIVED_MS_TEAMS_DSN'),
-+            'title'  => 'Message Title',
-+            'level'  => env('LOG_LEVEL', 'debug'),
-+            'emoji'  => '&#x1F3C1',
-+            'color'  => '#fd0404',
-+            'format' => '[%datetime%] %channel%.%level_name%: %message%'
-
++            'level'  => env('LOG_LEVEL', 'debug'), // or simply 'debug'
++            'title'  => 'Message Title', // can be NULL
++            'subject'  => 'Message Subject', // can be NULL
++            'emoji'  => '&#x1F3C1', // can be NULL
++            'color'  => '#fd0404', // can be NULL
++            'format' => '[%datetime%] %channel%.%level_name%: %message%' // can be NULL
 +        ],
 
 ...
@@ -142,15 +153,25 @@ return [
 > 
 > *webhookDsn:*  
 > Microsoft Teams webhook url
->
-> *title:*  
-> title of Microsoft Teams Message
 > 
 > *level:*  
 > the minimum level for handler to be triggered and the message be logged in the channel (Monolog/Logger class: ‘debug’ = 100)
 >
-> *emoji:*  
-> emoji of Microsoft Teams Message (dsiplayed next to the mlessage title). Value needs to reflect the mattern: ‘&#x<EMOJI_HEX_CODE>’
+> *title (nullable):*  
+> title of Microsoft Teams Message
+> 
+> *subject (nullable):*  
+> subject of Microsoft Teams Message
+>
+> *emoji (nullable):*  
+> emoji of Microsoft Teams Message (displayed next to the message title). Value needs to reflect the pattern: ‘&#x<EMOJI_HEX_CODE>’
+>
+> *color (nullable):*  
+> hexadecimal color value for Message Card color theme
+>
+> *format (nullable):*  
+> message template - available options: %datetime% | %extra.token% | %channel% | %level_name% | %message%
+
 
 # Usage
 
