@@ -125,9 +125,11 @@ return [
 +            'via' => \Actived\MicrosoftTeamsNotifier\LogMonolog::class,
 +            'webhookDsn' => env('ACTIVED_MS_TEAMS_DSN'),
 +            'title'  => 'Message Title',
++            'level'  => env('LOG_LEVEL', 'debug'),
 +            'emoji'  => '&#x1F3C1',
 +            'color'  => '#fd0404',
 +            'format' => '[%datetime%] %channel%.%level_name%: %message%'
+
 +        ],
 
 ...
