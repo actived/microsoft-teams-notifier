@@ -18,6 +18,9 @@ use Actived\MicrosoftTeamsNotifier\Handler\MicrosoftTeamsHandler;
 
 class MicrosoftTeamsHandlerTest extends TestCase {
 
+    /**
+     * @var string
+     */
     private $webhookDsn;
 
     public function setUp(): void

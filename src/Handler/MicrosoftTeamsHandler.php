@@ -44,7 +44,7 @@ class MicrosoftTeamsHandler extends AbstractProcessingHandler
      * @param string|null $emoji
      * @param string|null $color
      * @param string|null $format
-     * @param int $level
+     * @param mixed $level
      * @param bool $bubble
      */
     public function __construct(
