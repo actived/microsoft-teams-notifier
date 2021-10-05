@@ -1,7 +1,7 @@
 Actived Microsoft Teams Notifier
 ================================
 
-![Package Version](https://img.shields.io/badge/Version-1.0.2-brightgreen.svg)
+![Package Version](https://img.shields.io/badge/Version-1.1.0-brightgreen.svg)
 
 A PHP package that defines custom Monolog handler to send Microsoft Teams notifications with an Incoming Webhook.
 The package aims to provide global messaging & log system that uses Microsoft Teams "MessageCard" notification and uses Monolog logging library.
@@ -16,6 +16,17 @@ The package aims to provide global messaging & log system that uses Microsoft Te
 ```sh
 $ composer require actived/microsoft-teams-notifier
 ```
+
+### Since version 1.1 of the package, `"symfony/monolog-bundle"` was removed and replaced with `"monolog/monolog"` dependency that makes Actived Microsoft Teams Notifier more flexible for global use:
+
+Please consider running `composer suggest` command to install required and missing dependencies related to framework you use (ex. Symfony):
+
+```sh
+$ composer suggest
+actived/microsoft-teams-notifier suggests:
+ - symfony/monolog-bundle: The MonologBundle provides integration of the Monolog library into the Symfony framework.
+```
+
 # Microsoft Teams Webhook setting
 
 Follow these steps to set up new Webhook:
@@ -110,7 +121,7 @@ ACTIVED_MS_TEAMS_DSN=webhook_dsn
 
 Modify your Monolog logging settings that will point to the new handler:
 
-### att: definition of ALL parameters is compulsory - please use NULL value for attributes you want to skip.
+### Att: definition of ALL parameters is compulsory - please use NULL value for attributes you want to skip.
 
 ```diff
 // config\logging.php

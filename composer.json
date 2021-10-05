@@ -31,6 +31,9 @@
     "phpstan/phpstan": "^0.12.87",
     "phpunit/phpunit": "^9.5"
   },
+  "suggest": {
+    "symfony/monolog-bundle": "The MonologBundle provides integration of the Monolog library into the Symfony framework."
+  },
   "scripts": {
     "test": "vendor/bin/phpunit",
     "phpstan": "vendor/bin/phpstan analyse"
