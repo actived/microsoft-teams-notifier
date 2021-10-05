@@ -25,7 +25,7 @@
   },
   "require": {
     "php": ">=7.2",
-    "symfony/monolog-bundle": "^3.7"
+    "monolog/monolog": "^1.22|^2.0"
   },
   "require-dev": {
     "phpstan/phpstan": "^0.12.87",
