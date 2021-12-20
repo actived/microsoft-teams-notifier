@@ -25,7 +25,7 @@ class LogMonolog
         return new Logger(
             $config['title'],
             [new MicrosoftTeamsHandler(
-                    $config['webhookDsn'],
+                    $config['dsn'],
                     $config['level'],
                     $config['title'],
                     $config['subject'],
