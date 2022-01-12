@@ -183,12 +183,12 @@ class MicrosoftTeamsRecord {
     {
         $this->data['sections'] = [];
 
-        $facts = [$this->getFact('Level', $record['level_name'])];
-
         foreach (array('extra', 'context') as $element) {
             if (empty($record[$element])) {
                 continue;
             }
+
+            $facts = [$this->getFact('Level', $record['level_name'])];
 
             foreach($record[$element] as $key => $value){
                 if($value instanceof \Exception){
