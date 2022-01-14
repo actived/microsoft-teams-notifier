@@ -64,7 +64,7 @@ services:
 +            $subject: 'Message subject' 
 +            $emoji:  '&#x1F6A8'  
 +            $color: '#fd0404' 
-+            $format: '[%datetime%] %channel%.%level_name%: %message%'
++            $format: '[%%datetime%%] %%channel%%.%%level_name%%: %%message%%'
 ```
 > *$webhookDsn:*  
 > Microsoft Teams webhook url
