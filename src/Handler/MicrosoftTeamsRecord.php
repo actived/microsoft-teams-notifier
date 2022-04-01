@@ -221,7 +221,7 @@ class MicrosoftTeamsRecord {
      * @param bool $isQuoted
      * @return array
      */
-    public function getFact(string|int $name, $value, bool $isQuoted = false): array
+    public function getFact($name, $value, bool $isQuoted = false): array
     {
         if (is_int($name)) {
             $name = strval($name);
