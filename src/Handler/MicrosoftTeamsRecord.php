@@ -216,13 +216,16 @@ class MicrosoftTeamsRecord {
     }
 
     /**
-     * @param string $name
+     * @param mixed $name
      * @param mixed $value
      * @param bool $isQuoted
      * @return array
      */
-    public function getFact(string $name, $value, bool $isQuoted = false): array
+    public function getFact($name, $value, bool $isQuoted = false): array
     {
+        if (!is_string($name)) {
+            $name = strval($name);
+        }
         $name = trim(str_replace('_', ' ', $name));
         $value = $this->transformValue($value);
         return [
