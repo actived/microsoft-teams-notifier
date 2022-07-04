@@ -20,7 +20,7 @@ class LogMonolog
      * @param array $config
      * @return Logger
      */
-    public function __invoke(array $config)
+    public function __invoke(array $config): Logger
     {
         return new Logger(
             $config['title'],
