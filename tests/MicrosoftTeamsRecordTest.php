@@ -9,16 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Actived\MicrosoftTeamsNotifier\Tests;
+namespace Actived\MicrosoftTeamsNotifier;
 
 use Actived\MicrosoftTeamsNotifier\Handler\MicrosoftTeamsRecord;
 use Monolog\DateTimeImmutable;
+use Monolog\Level;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 
-class MicrosoftTeamsRecordTest extends TestCase {
-
-    public function testCreate()
+class MicrosoftTeamsRecordTest extends TestCase
+{
+    /**
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws \PHPUnit\Framework\ExpectationFailedException
+     * @throws \PHPUnit\Framework\Exception
+     */
+    public function testCreate(): void
     {
         $title = 'Message Title';
         $subject = 'Message Subject';
@@ -28,7 +35,12 @@ class MicrosoftTeamsRecordTest extends TestCase {
         $this->assertEquals('Message Subject', $record->getSubject());
     }
 
-    public function testData()
+    /**
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws \PHPUnit\Framework\ExpectationFailedException
+     * @throws \PHPUnit\Framework\Exception
+     */
+    public function testData(): void
     {
         $title = 'Message Title';
         $subject = 'Message Subject';
@@ -45,17 +57,18 @@ class MicrosoftTeamsRecordTest extends TestCase {
     }
 
     /**
-     * @return array Record
+     * @return LogRecord Record
      */
-    protected function getRecordData($level = Logger::DEBUG, $message = 'log test', array $context = []): array
+    protected function getRecordData(Level $level = Level::Debug, string $message = 'log test', array $context = []): LogRecord
     {
-        return [
-            'message' => (string) $message,
-            'context' => $context,
-            'level' => $level,
-            'level_name' => Logger::getLevelName($level),
-            'datetime' => new DateTimeImmutable(true),
-            'formatted' => 'Formatted message',
-        ];
+        return new LogRecord(
+            datetime: new DateTimeImmutable(true),
+            channel: 'Test',
+            level: $level,
+            message: $message,
+            context: $context,
+            extra: [],
+            formatted: 'Formatted message'
+        );
     }
 }

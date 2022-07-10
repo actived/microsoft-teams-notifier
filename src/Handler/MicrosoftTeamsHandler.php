@@ -14,7 +14,10 @@ namespace Actived\MicrosoftTeamsNotifier\Handler;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Level;
 use Monolog\Logger;
+use Monolog\LogRecord;
+use Psr\Log\LogLevel;
 
 class MicrosoftTeamsHandler extends AbstractProcessingHandler
 {
@@ -22,34 +25,35 @@ class MicrosoftTeamsHandler extends AbstractProcessingHandler
      * MicrosoftTeams Webhook DSN
      * @var string
      */
-    private $webhookDsn;
+    private string $webhookDsn;
 
     /**
      * Instance of the MicrosoftTeamsRecord
      * @var MicrosoftTeamsRecord
      */
-    private $microsoftTeamsRecord;
+    private MicrosoftTeamsRecord $microsoftTeamsRecord;
 
     /**
      * Format of the message
      * @var string|null
      */
-    private $format;
+    private ?string $format;
 
     /**
-     * MicrosoftTeamsHandler constructor.
      * @param string $webhookDsn
+     * @param int|string|Level $level
      * @param string $title
      * @param string $subject
      * @param string|null $emoji
      * @param string|null $color
      * @param string|null $format
-     * @param mixed $level
      * @param bool $bubble
+     *
+     * @phpstan-param value-of<Level::VALUES>|value-of<Level::NAMES>|Level|LogLevel::* $level
      */
     public function __construct(
         string $webhookDsn,
-        $level = Logger::DEBUG,
+        int|string|Level $level = Level::Debug,
         string $title = 'Message',
         string $subject = 'Date',
         ?string $emoji = null,
@@ -90,12 +94,15 @@ class MicrosoftTeamsHandler extends AbstractProcessingHandler
     }
 
     /**
-     * {@inheritdoc}
+     * Writes the (already formatted) record down to the log of the implementing handler
+     *
+     * @throws \RuntimeException
      */
-    protected function write(array $record): void
+    protected function write(LogRecord $record): void
     {
         $postData = $this->microsoftTeamsRecord->setData($record)->getData();
         $dataString = json_encode($postData);
+
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, $this->webhookDsn);
@@ -109,21 +116,24 @@ class MicrosoftTeamsHandler extends AbstractProcessingHandler
     }
 
     /**
-     * @param mixed $ch
+     * @param \CurlHandle $ch
      * @param int $repeat
      * @return bool|string
+     * @throws \RuntimeException
      */
-    public static function execute($ch, int $repeat = 3)
+    public static function execute(\CurlHandle $ch, int $repeat = 3): bool|string
     {
         while ($repeat--) {
             $response = curl_exec($ch);
 
             if (false === $response) {
-                if(!$repeat){
+                if (!$repeat) {
                     $errno = curl_errno($ch);
                     $error = curl_error($ch);
+
                     throw new \RuntimeException(sprintf('Curl error %d: %s', $errno, $error));
                 }
+
                 continue;
             }
 

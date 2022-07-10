@@ -47,3 +47,5 @@ Thumbs.db
 vendor/
 composer.lock
 
+# cache files
+.phpunit.result.cache
