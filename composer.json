@@ -24,13 +24,13 @@
       }
   },
   "require": {
-    "php": ">=7.2",
+    "php": "^8.1",
     "ext-curl": "*",
     "ext-json": "*",
-    "monolog/monolog": "^1.22|^2.0"
+    "monolog/monolog": "^3.1"
   },
   "require-dev": {
-    "phpstan/phpstan": "^0.12.87",
+    "phpstan/phpstan": "^1.8",
     "phpunit/phpunit": "^9.5"
   },
   "suggest": {

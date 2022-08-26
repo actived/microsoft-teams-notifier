@@ -11,7 +11,9 @@
 
 namespace Actived\MicrosoftTeamsNotifier\Handler;
 
+use Monolog\Level;
 use Monolog\Logger;
+use Monolog\LogRecord;
 
 class MicrosoftTeamsRecord {
 
@@ -40,27 +42,27 @@ class MicrosoftTeamsRecord {
     /**
      * @var string
      */
-    private $title;
+    private string $title;
 
     /**
      * @var string
      */
-    private $subject;
+    private string $subject;
 
     /**
      * @var string|null
      */
-    private $emoji;
+    private ?string $emoji;
 
     /**
      * @var string|null
      */
-    private $color;
+    private ?string $color;
 
     /**
      * @var array
      */
-    private $data = [];
+    private array $data = [];
 
     /**
      * MicrosoftTeamsRecord constructor
@@ -94,16 +96,22 @@ class MicrosoftTeamsRecord {
 
     /**
      * Returns data in Microsoft Teams Card format.
-     * @param array $record
-     * @return $this
+     * @param LogRecord $record
+     * @return self
      */
-    public function setData(array $record): self
+    public function setData(LogRecord $record): self
     {
+        $formatted = '';
+
+        if (is_string($record->formatted)) {
+            $formatted = $record->formatted;
+        }
+
         $this->setType()
             ->setContext()
-            ->setThemeColor($record['level'])
-            ->setTitle($record['level'])
-            ->setText($record['formatted'])
+            ->setThemeColor($record->level->value)
+            ->setTitle($record->level->value)
+            ->setText($formatted)
             ->setSections($record)
         ;
 
@@ -120,7 +128,7 @@ class MicrosoftTeamsRecord {
 
     /**
      * @param string $type
-     * @return $this
+     * @return self
      */
     public function setType(string $type = self::CARD_TYPE): self
     {
@@ -131,7 +139,7 @@ class MicrosoftTeamsRecord {
 
     /**
      * @param string $context
-     * @return $this
+     * @return self
      */
     public function setContext(string $context = self::CARD_CONTEXT): self
     {
@@ -142,7 +150,7 @@ class MicrosoftTeamsRecord {
 
     /**
      * @param int $level
-     * @return $this
+     * @return self
      */
     public function setThemeColor(int $level): self
     {
@@ -153,7 +161,7 @@ class MicrosoftTeamsRecord {
 
     /**
      * @param int $level
-     * @return $this
+     * @return self
      */
     public function setTitle(int $level): self
     {
@@ -166,7 +174,7 @@ class MicrosoftTeamsRecord {
 
     /**
      * @param string $text
-     * @return $this
+     * @return self
      */
     public function setText(string $text): self
     {
@@ -176,23 +184,25 @@ class MicrosoftTeamsRecord {
     }
 
     /**
-     * @param array $record
-     * @return $this
+     * @param LogRecord $record
+     * @return self
      */
-    public function setSections(array $record): self
+    public function setSections(LogRecord $record): self
     {
         $this->data['sections'] = [];
 
         foreach (array('extra', 'context') as $element) {
-            if (empty($record[$element])) {
+            if (empty($record->$element)) {
                 continue;
             }
 
-            $facts = [$this->getFact('Level', $record['level_name'])];
+            $levelName = Level::fromValue($record->level->value)->getName();
 
-            foreach($record[$element] as $key => $value){
-                if($value instanceof \Exception){
-                    /** @var \Exception $value */
+            $facts = [$this->getFact('Level', $levelName)];
+
+            foreach($record->$element as $key => $value){
+                if ($value instanceof \Throwable) {
+                    /** @var \Throwable $value */
                     array_push($facts,
                         $this->getFact('message', $value->getMessage()),
                         $this->getFact('Code', $value->getCode()),
@@ -207,7 +217,7 @@ class MicrosoftTeamsRecord {
 
             $this->data['sections'][] = [
                 'activityTitle' => $this->subject,
-                'activitySubtitle' => $record['datetime']->format('Y/m/d g:i A'),
+                'activitySubtitle' => $record->datetime->format('Y/m/d g:i A'),
                 'facts' => $facts
             ];
         }
@@ -221,32 +231,39 @@ class MicrosoftTeamsRecord {
      * @param bool $isQuoted
      * @return array
      */
-    public function getFact($name, $value, bool $isQuoted = false): array
+    public function getFact(string|int $name, mixed $value, bool $isQuoted = false): array
     {
         if (is_int($name)) {
             $name = strval($name);
         }
+
         $name = trim(str_replace('_', ' ', $name));
         $value = $this->transformValue($value);
+
+        $doQuote = $isQuoted && (is_string($value) || is_bool($value) || is_float($value) || is_int($value) || null === $value);
+
         return [
             'name' => ucfirst($name).':',
-            'value' => $isQuoted ? sprintf('%s %s %s','<pre>', $value, '</pre>') : $value,
+            'value' => $doQuote ? sprintf('%s %s %s','<pre>', $value, '</pre>') : $value,
         ];
     }
 
     /**
      * @param mixed $value
-     * @return false|string
+     * @return mixed
      */
-    protected function transformValue($value){
-        $return = $value;
-        if(is_array($value)){
+    protected function transformValue(mixed $value): mixed
+    {
+        if (is_array($value)) {
             $value = json_encode($value, JSON_PRETTY_PRINT);
-            $return = !empty($value) ? substr($value, 0, 1000) : '';
-        } else if(is_string($value)){
-            $return = substr($value, 0, 1000);
+            return !empty($value) ? substr($value, 0, 1000) : '';
         }
-        return $return;
+
+        if (is_string($value)) {
+            return substr($value, 0, 1000);
+        }
+
+        return $value;
     }
 
     /**
@@ -256,16 +273,12 @@ class MicrosoftTeamsRecord {
      */
     public function getThemeColor(int $level): string
     {
-        switch (true) {
-            case $level >= Logger::ERROR:
-                return static::COLOR_DANGER;
-            case $level >= Logger::WARNING:
-                return static::COLOR_WARNING;
-            case $level >= Logger::INFO:
-                return static::COLOR_INFO;
-            default:
-                return static::COLOR_DEFAULT;
-        }
+        return match (true) {
+            $level >= Level::Error->value => static::COLOR_DANGER,
+            $level >= Level::Warning->value => static::COLOR_WARNING,
+            $level >= Level::Info->value => static::COLOR_INFO,
+            default => static::COLOR_DEFAULT,
+        };
     }
 
     /**
@@ -275,15 +288,11 @@ class MicrosoftTeamsRecord {
      */
     public function getEmoji(int $level): string
     {
-        switch (true) {
-            case $level >= Logger::ERROR:
-                return static::EMOJI_DANGER;
-            case $level >= Logger::WARNING:
-                return static::EMOJI_WARNING;
-            case $level >= Logger::INFO:
-                return static::EMOJI_INFO;
-            default:
-                return static::EMOJI_DEFAULT;
-        }
+        return match (true) {
+            $level >= Level::Error->value => static::EMOJI_DANGER,
+            $level >= Level::Warning->value => static::EMOJI_WARNING,
+            $level >= Level::Info->value => static::EMOJI_INFO,
+            default => static::EMOJI_DEFAULT,
+        };
     }
 }

@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Actived\MicrosoftTeamsNotifier\Tests;
+namespace Actived\MicrosoftTeamsNotifier;
 
 use Actived\MicrosoftTeamsNotifier\Handler\MicrosoftTeamsRecord;
+use Monolog\Level;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Actived\MicrosoftTeamsNotifier\Handler\MicrosoftTeamsHandler;
@@ -21,22 +22,38 @@ class MicrosoftTeamsHandlerTest extends TestCase {
     /**
      * @var string
      */
-    private $webhookDsn;
+    private string $webhookDsn;
 
-    public function setUp(): void
+    /**
+     * @throws \PHPUnit\Framework\ExpectationFailedException
+     * @throws \RuntimeException
+     */
+    protected function setUp(): void
     {
         parent::setUp();
 
-        if (!$this->webhookDsn = getenv('TEST_WEBHOOK_DSN')) {
+        $envDsn = getenv('TEST_WEBHOOK_DSN');
+
+        if (!$envDsn) {
             throw new \RuntimeException('TEST_WEBHOOK_DSN env variable not found!');
         }
+
+        $this->webhookDsn = $envDsn;
     }
 
+    /**
+     * @throws void
+     */
     private function createHandler(): MicrosoftTeamsHandler
     {
-        return new MicrosoftTeamsHandler($this->webhookDsn, Logger::DEBUG);
+        return new MicrosoftTeamsHandler($this->webhookDsn, Level::Debug);
     }
 
+    /**
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws \PHPUnit\Framework\ExpectationFailedException
+     * @throws \PHPUnit\Framework\Exception
+     */
     public function testHandler(): void
     {
         $handler = $this->createHandler();
